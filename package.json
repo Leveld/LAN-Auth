@@ -1,0 +1,22 @@
+{
+  "name": "capstone-auth",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node src/server/server.js",
+    "watch": "nodemon src/server/server.js",
+    "dev-win": "npm run watch",
+    "dev-unix": "npm run watch",
+    "devw": "npm run dev-win",
+    "devm": "npm run dev-unix",
+    "devl": "npm run dev-unix"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "eslint": "^3.17.1",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0",
+    "eslint-plugin-react": "^6.9.0",
+    "express": "^4.16.2"
+  }
+}
