@@ -42,7 +42,16 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
     },
     withCredentials: true
   });
-  const { email_verified, email, updated_at, name,  picture, user_id } = userInfo = info.data;
+  const { email_verified, email, updated_at, name,  picture, user_id, created_at } = userInfo = info.data;
+
+  await axios.post('/user', {
+    email,
+    fields: {
+      name,
+      createdAt: created_at,
+      auth0ID: sub
+    }
+  });
 
   console.log(JSON.stringify(userInfo, null, 2));
   await res
