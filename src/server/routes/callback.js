@@ -62,6 +62,13 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
     });
   }
 
+  await axios.post(`${authServerIP}token`, {
+    token: access_token,
+    email,
+    emailVerified: email_verified,
+    expires: new Date((new Date() / 1) + (1000 * expires_in)).toISOString()
+  })
+
   console.log(access_token);
   await res
         .status(307)

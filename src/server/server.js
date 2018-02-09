@@ -26,7 +26,7 @@ app.use('/', apiRoutes);
 app.get('/banana', (req, res) => {
   console.log('banana');
   console.log(req.body);
-  res.send(new Date() / 1);
+  res.send({ banana: new Date() / 1 });
 });
 
 app.listen(PORT, () => {

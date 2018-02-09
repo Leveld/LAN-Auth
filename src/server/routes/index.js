@@ -4,8 +4,6 @@ const express = require('express');
 const router = express.Router();
 
 // Subroutes
-const authenticateSubroute = require('./authenticate.js');
-const loginSubroute = require('./login.js');
 const callbacks = require('./callback.js');
 const storage = require('./storage.js');
 
@@ -14,7 +12,8 @@ router.use('/login', callbacks.credentialsRouter);
 // OAuth callback for User Authentication
 router.use('/oauth', callbacks.authRouter);
 // Auth DB /storeToken
-router.use('/storeToken', storage);
+router.use('/token', storage.tokenAuth);
+router.use('/tokenExpired', storage.tokenExpired);
 
 //router.use('/authenticate', autenticateSubroute);
 

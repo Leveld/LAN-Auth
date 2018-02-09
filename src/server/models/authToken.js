@@ -16,4 +16,4 @@ const authTokenSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('authToken', authTokenSchema);
+module.exports = mongoose.model('AuthToken', authTokenSchema);

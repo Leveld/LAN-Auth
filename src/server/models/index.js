@@ -1,5 +1,5 @@
 // authToken Model
-const AuthToken = require('./AuthToken');
+const AuthToken = require('./authToken');
 
 
 module.exports = {
