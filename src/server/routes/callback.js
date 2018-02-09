@@ -44,14 +44,25 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
   });
   const { email_verified, email, updated_at, name,  picture, user_id, created_at } = userInfo = info.data;
 
-  await axios.post('/user', {
-    email,
-    fields: {
-      name,
-      createdAt: created_at,
-      auth0ID: sub
-    }
-  });
+  try {
+    await axios.get(`${dbServerIP}user?email=${email}`);
+    //user exists
+  } catch (error) {
+    // user doesn't exist
+    // TODO add support for other errors that could occur
+    // instead of just assuming that the error is from
+    // a user not existing
+    await axios.post(`${dbServerIP}user`, {
+      email,
+      fields: {
+        name,
+        createdAt: created_at,
+        auth0ID: sub
+      }
+    });
+  }
+
+
 
   console.log(JSON.stringify(userInfo, null, 2));
   await res
