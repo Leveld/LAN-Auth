@@ -18,13 +18,13 @@ if (!process.env.PRODUCTION) {
   apiServerIP   = 'http://api.localhost.test:3001/';
   authServerIP  = 'http://auth.localhost.test:3002/';
   dbServerIP    = 'http://db.localhost.test:3003/';
-  authDBIP      = 'localhost:27017';
+  authDBIP      = 'localhost:2000/capstone-auth';
 } else {
   frontServerIP = 'http://leveld.com:3000/';
   apiServerIP   = 'http://api.leveld.com:3001/';
   authServerIP  = 'http://auth.leveld.com:3002/';
   dbServerIP    = 'http://db.leveld.com:3003/';
-  authDBIP      = 'localhost:27017';
+  authDBIP      = 'localhost:2000/capstone-auth';
 }
 
 module.exports = {

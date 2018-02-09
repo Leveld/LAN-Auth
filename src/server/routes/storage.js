@@ -16,7 +16,7 @@ const { AuthToken } = require('../models');
 const { asyncMiddleware, authDBIP, authServerIP, apiServerIP } = require('../util');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://' + authDBIP, { useMongoClient: true });
+mongoose.connect('mongodb://' + authDBIP);
 
 
 // POST /storeToken

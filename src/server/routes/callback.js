@@ -7,7 +7,7 @@ const authRouter = express.Router();
 // Express router credentials
 const credentialsRouter = express.Router();
 // util
-const { asyncMiddleware, frontServerIP, authServerIP, clientID, clientSecret, managementToken } = require('../util.js');
+const { asyncMiddleware, frontServerIP, authServerIP, dbServerIP, clientID, clientSecret, managementToken } = require('../util.js');
 
 const obj = {};
 
@@ -62,12 +62,10 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
     });
   }
 
-
-
-  console.log(JSON.stringify(userInfo, null, 2));
+  console.log(access_token);
   await res
         .status(307)
-        .header('Acess-Token', access_token)
+        .header('Authorization', `Bearer ${access_token}`)
         .redirect(frontServerIP);
 }));
 
