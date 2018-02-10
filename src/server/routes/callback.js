@@ -72,7 +72,7 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
   console.log(access_token);
   await res
         .status(307)
-        .header('Authorization', `Bearer ${access_token}`)
+        .cookie('token', access_token)
         .redirect(frontServerIP);
 }));
 
