@@ -43,6 +43,7 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
     withCredentials: true
   });
   const { email_verified, email, updated_at, name,  picture, user_id, created_at } = userInfo = info.data;
+  let newUser = false;
 
   try {
     await axios.get(`${dbServerIP}user?email=${email}`);
@@ -60,6 +61,7 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
         auth0ID: sub
       }
     });
+    newUser = true;
   }
 
   await axios.post(`${authServerIP}token`, {
@@ -70,10 +72,13 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
   })
 
   console.log(access_token);
-  await res
-        .status(307)
-        .cookie('token', access_token)
-        .redirect(frontServerIP);
+  if (email_verified)
+    await res
+          .status(307)
+          .cookie('token', access_token)
+          .redirect(frontServerIP + (newUser ? 'register' : ''));
+  else
+    await res.redirect(`${frontServerIP}error?type=verify`);
 }));
 
 module.exports = {
