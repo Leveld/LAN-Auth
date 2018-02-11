@@ -1,8 +1,8 @@
 const USER_ERROR = 422;
 
 const errorHandler = (error, req, res, next, message) => {
-  message = message || 'Oops! Looks like that doesn\'t work :(';
-  res.status(USER_ERROR).send({error: error.stack, message});
+  message = message || error ? error.message : undefined || 'Oops! Looks like that doesn\'t work :(';
+  res.status(error ? error.status : undefined || USER_ERROR).send({ error: error.stack, message });
 };
 
 const asyncMiddleware = cb =>
@@ -10,9 +10,9 @@ const asyncMiddleware = cb =>
     Promise.resolve(cb(req, res, next)).catch(error => errorHandler(error, req, res, next));
 
 let frontServerIP = '';
-let apiServerIP = '';
-let authServerIP = '';
-let dbServerIP = '';
+let apiServerIP   = '';
+let authServerIP  = '';
+let dbServerIP    = '';
 if (!process.env.PRODUCTION) {
   frontServerIP = 'http://localhost.test:3000/';
   apiServerIP   = 'http://api.localhost.test:3001/';
