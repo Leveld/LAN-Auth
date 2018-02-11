@@ -69,13 +69,19 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
     email,
     emailVerified: email_verified,
     expires: new Date((new Date() / 1) + (1000 * expires_in)).toISOString()
-  })
+  });
 
   console.log(access_token);
+
+  const domain = /^(https?:\/\/)?([^:^\/]*)(:[0-9]*)(\/[^#^?]*)(.*)/g.exec(frontServerIP);
+
   if (email_verified)
     await res
           .status(307)
-          .cookie('token', access_token)
+          .cookie('access_token', access_token, {
+            secure: false,
+            domain: domain[2]
+          })
           .redirect(frontServerIP + (newUser ? 'register' : ''));
   else
     await res.redirect(`${frontServerIP}error?type=verify`);
