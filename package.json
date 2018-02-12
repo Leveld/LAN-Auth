@@ -2,7 +2,7 @@
   "name": "capstone-auth",
   "version": "0.0.1",
   "scripts": {
-    "start": "node src/server/server.js",
+    "start": "nodemon src/server/server.js",
     "watch": "nodemon src/server/server.js",
     "dev-win": "start npm run mongo && npm run watch",
     "dev-unix": "npm run mongo & npm run watch",

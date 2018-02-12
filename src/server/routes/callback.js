@@ -74,13 +74,13 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
   console.log(access_token);
 
   const domain = /^(https?:\/\/)?([^:^\/]*)(:[0-9]*)(\/[^#^?]*)(.*)/g.exec(frontServerIP);
-
   if (email_verified)
     await res
           .status(307)
           .cookie('access_token', access_token, {
             secure: false,
-            domain: domain[2]
+            domain: domain[2],
+            maxAge: 604800
           })
           .redirect(frontServerIP + (newUser ? 'register' : ''));
   else
