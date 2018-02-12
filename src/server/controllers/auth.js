@@ -1,22 +1,15 @@
-// Axios
 const axios = require('axios');
-// Express server
-const express = require('express');
-// Exporess router oAuth
-const authRouter = express.Router();
-// Express router credentials
-const credentialsRouter = express.Router();
-// util
-const { asyncMiddleware, frontServerIP, authServerIP, dbServerIP, clientID, clientSecret, managementToken } = require('../util.js');
+const { asyncMiddleware, frontServerIP, authServerIP, dbServerIP, } = require('capstone-utils');
 
-const obj = {};
+const { clientID, clientSecret, managementToken } = require('../secret.json');
 
 // GET /oauth
-authRouter.get('/', (req, res) => {
-  res.json();
-});
+const getOAuth = async (req, res, next) => {
+   res.json();
+};
+
 // GET /login
-credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
+const loginCallback = async (req, res, next) => {
   const { code, state } = req.query;
 
   const auth = await axios.post('https://leveld.auth0.com/oauth/token', {
@@ -74,6 +67,7 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
   console.log(access_token);
 
   const domain = /^(https?:\/\/)?([^:^\/]*)(:[0-9]*)(\/[^#^?]*)(.*)/g.exec(frontServerIP);
+
   if (email_verified)
     await res
           .status(307)
@@ -85,9 +79,9 @@ credentialsRouter.get('/', asyncMiddleware(async (req, res, next) => {
           .redirect(frontServerIP + (newUser ? 'register' : ''));
   else
     await res.redirect(`${frontServerIP}error?type=verify`);
-}));
+};
 
 module.exports = {
-  authRouter,
-  credentialsRouter
+  getOAuth,
+  loginCallback
 };
