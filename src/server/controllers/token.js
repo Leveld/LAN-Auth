@@ -73,7 +73,6 @@ const storeToken = async (req, res, next) => {
     await newAuthToken.save();
     return await res.send(newAuthToken);
   } catch (error) {
-    console.log(error);
     return await res.status(400).json({ status: false, message: 'Missing Data' });
   }
 };
