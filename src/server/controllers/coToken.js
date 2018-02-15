@@ -11,7 +11,7 @@ const error = (name, message, status = USER_ERROR) => {
 };
 
 const getToken = async (req, res, next) => {
-  const { contentOutlet } = req.body;
+  const { contentOutlet } = req.query;
   const token = await COToken.findOne({ contentOutlet });
 
   if (!token)

@@ -2,8 +2,18 @@ const mongoose = require('mongoose');
 
 const COToken = mongoose.Schema({
   token: {
-    type: String,
-    required: true
+    token: {
+      type: String,
+      required: true
+    },
+    refreshToken: {
+      type: String,
+      required: true
+    },
+    expires: {
+      type: Date,
+      required: true
+    }
   },
   contentOutlet: {
     type: mongoose.Schema.Types.ObjectId,

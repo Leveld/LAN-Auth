@@ -77,28 +77,49 @@ const storeToken = async (req, res, next) => {
   }
 };
 
+const updateToken = async (req, res, next) => {
+  const { id, fields } = req.body;
+
+  if(typeof id !== 'string' || typeof fields !== 'object')
+    await res.status(400).json({ status: false, message: 'Missing Data' });
+
+  try {
+    const token = await AuthToken.findOne({ _id: id });
+
+    for (let [key, value] of Object.entries(fields)) {
+      token[key] = value;
+    }
+
+    await token.save();
+    await res.send(token.toObject({ depopulate: true }));
+
+  } catch (error) {
+    return await res.status(400).json({ status: false, message: 'Token malformed or does not exist' });
+  }
+};
+
 
 // GET /tokenExpired
-// I don't think we need this since GET /token will return an error saying a token
-// is expired.
-// const isTokenExpired = async (req, res, next) => {
-//   try {
-//     // Get the token from the params
-//     const { token } = req.params;
-//     // If the token doesn't exist, error
-//     if (!token) await re.status(400).json({ status: false, message: 'Missing Data' });
-//     // find the token in the database
-//     const tokenData = await axios.get(`${authServerIP}/token`, { params: { token } });
-//     // check status of request for status of token
-//     if (!tokenData.status || !tokendata.token) return res.json({ status: false });
-//     // should be good
-//     await res.json({ status: true });
-//   } catch (error) {
-//     return await res.status(422).json({ status: false, message: 'Token malformed or does not exist' });
-//   }
-// };
+const isTokenExpired = async (req, res, next) => {
+  try {
+    // Get the token from the params
+    const { token } = req.params;
+    // If the token doesn't exist, error
+    if (!token) await re.status(400).json({ status: false, message: 'Missing Data' });
+    // find the token in the database
+    const tokenData = await axios.get(`${authServerIP}/token`, { params: { token } });
+    // check status of request for status of token
+    if (!tokenData.status || !tokendata.token) return res.json({ status: false });
+    // should be good
+    await res.json({ status: true });
+  } catch (error) {
+    return await res.status(422).json({ status: false, message: 'Token malformed or does not exist' });
+  }
+};
 
 module.exports = {
   getToken,
-  storeToken
+  storeToken,
+  updateToken,
+  isTokenExpired
 };
