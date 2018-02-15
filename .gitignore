@@ -66,3 +66,4 @@ src/public/css
 src/public/js
 data/db/*
 data/*
+src/server/secret.json
