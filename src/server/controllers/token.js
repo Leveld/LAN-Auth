@@ -10,7 +10,7 @@ const getToken = async (req, res, next) => {
     const { token } = req.query;
     // If the token doesn't exist, error
     if (!token)
-      return await res.status(400).json({ status: false, message: 'Missing Data', received: req.query });
+      return await res.status(400).json({ status: false, message: `Missing Data | received: ${JSON.stringify(req.query)}` });
     // find the token in the database
     // couldn't figure out if you could use async/await with this
     const tokenDoc = await AuthToken.findOne({ 'token.token': token });
@@ -40,7 +40,7 @@ const storeToken = async (req, res, next) => {
   // return status error and error message
   // first, verify token
   if (!token || !email || !emailVerified || !expires)
-    await res.status(400).json({ status: false, message: 'Missing Data', received: req.body });
+    await res.status(400).json({ status: false, message: `Missing Data | received: ${JSON.stringify(req.body)}` });
   //TODO verify token
   //TODO verify email
   // Get userid for email
@@ -72,15 +72,16 @@ const storeToken = async (req, res, next) => {
     await newAuthToken.save();
     return await res.send(newAuthToken);
   } catch (error) {
-    return await res.status(400).json({ status: false, message: 'Missing Data', received: req.body });
+    return await res.status(400).json({ status: false, message: `Missing Data | received: ${JSON.stringify(req.body)}` });
   }
 };
 
+// PATCH /token
 const updateToken = async (req, res, next) => {
   const { token, fields } = req.body;
 
-  if(typeof id !== 'string' || typeof fields !== 'object')
-    await res.status(400).json({ status: false, message: 'Missing Data', received: req.body });
+  if(typeof token !== 'string' || typeof fields !== 'object')
+    await res.status(400).json({ status: false, message: `Missing Data | received: ${JSON.stringify(req.body)}` });
 
   try {
     const authToken = await AuthToken.findOne({ 'token.token': token });
@@ -104,7 +105,7 @@ const isTokenExpired = async (req, res, next) => {
     // Get the token from the query
     const { token } = req.query;
     // If the token doesn't exist, error
-    if (!token) await re.status(400).json({ status: false, message: 'Missing Data', received: req.query });
+    if (!token) await re.status(400).json({ status: false, message: `Missing Data | received: ${JSON.stringify(req.query)}` });
     // find the token in the database
     const tokenData = await axios.get(`${authServerIP}/token`, { params: { token } });
     // check status of request for status of token

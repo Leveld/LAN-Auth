@@ -3,7 +3,7 @@ const base64 = require('base64-url');
 const { google } = require('googleapis');
 const plus = google.plus('v1');
 const OAuth2Client = google.auth.OAuth2;
-const { frontServerIP, authServerIP, dbServerIP } = require('capstone-utils');
+const { frontServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT } = require('capstone-utils');
 
 const { clientID, clientSecret, managementToken } = require('../secret.json');
 const { COToken } = require('../models');
@@ -99,6 +99,8 @@ const googleCallback = async (req, res, next) => {
         }
       });
 
+      console.log('contentOutlet created')
+
       if (contentOutlet)
         contentOutlet = contentOutlet.data;
 
@@ -112,12 +114,18 @@ const googleCallback = async (req, res, next) => {
         contentOutlet: contentOutlet._id
       });
 
+      console.log('content token created')
+
+      console.log(`userID: ${userID} | type: ${userType}`)
+
       // add ContentOutlet to user
       await axios.patch(`${dbServerIP}user/co`, {
         id: userID,
         type: userType,
         contentOutlet: contentOutlet._id
       });
+
+      console.log('contentoutlet added to user')
 
       await res.status(307).redirect(`${frontServerIP}${redirect}`);
     } catch (error) {
@@ -191,7 +199,7 @@ const loginCallback = async (req, res, next) => {
 
   const domain = /^(https?:\/\/)?([^:^\/]*)(:[0-9]*)(\/[^#^?]*)(.*)/g.exec(frontServerIP);
 
-  if (email_verified)
+  if (email_verified || IS_DEVELOPMENT)
     await res
           .status(307)
           .cookie('access_token', access_token, {
