@@ -8,7 +8,6 @@ const getToken = async (req, res, next) => {
   try {
     // Get the token from the params
     const { token } = req.query;
-    console.log(token)
     // If the token doesn't exist, error
     if (!token)
       return await res.status(400).json({ status: false, message: 'Missing Data' });

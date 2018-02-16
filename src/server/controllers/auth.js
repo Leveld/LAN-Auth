@@ -6,6 +6,7 @@ const OAuth2Client = google.auth.OAuth2;
 const { asyncMiddleware, frontServerIP, authServerIP, dbServerIP, } = require('capstone-utils');
 
 const { clientID, clientSecret, managementToken } = require('../secret.json');
+const { COToken } = require('../models');
 
 const oauth2Client = new OAuth2Client(
   '660421589652-k537cl8vg3v8imub4culbjon6f20fph6.apps.googleusercontent.com',
@@ -18,8 +19,6 @@ google.options({ auth: oauth2Client });
 // GET /coURL
 const generateURL = async (req, res, next) => {
   const { type = '', redirect = '', userID = '', userType = '' } = req.query;
-
-  console.log('hit', type, redirect, userID, userType);
 
   // TODO check type and redirect and user and userType are strings.
   const state = base64.encode(JSON.stringify({
@@ -70,50 +69,53 @@ const googleCallback = async (req, res, next) => {
     version: 'v3'
   });
 
-  await youtube.channels.list({
+  const callback = async (error, response) => {
+    try {
+      if (error)
+        throw error;
+
+      const channelID = response.data.items[0].id;
+      const channelLink = `https://www.youtube.com/channel/${channelID}`;
+      const profilePicture = response.data.items[0].snippet.thumbnails.default.url;
+      const channelName = response.data.items[0].snippet.localized.title;
+
+      let contentOutlet = await axios.post(`${dbServerIP}outlet`, {
+        fields: {
+          channelID,
+          channelLink,
+          profilePicture,
+          channelName,
+          owner: {
+            ownerType: userType,
+            ownerID: userID
+          }
+        }
+      });
+
+      if (contentOutlet)
+        contentOutlet = contentOutlet.data;
+
+      const coToken = new COToken({
+        token: {
+          token,
+          refreshToken,
+          expires
+         },
+        contentOutlet: contentOutlet._id
+      });
+
+      await coToken.save();
+
+      await res.status(307).redirect(`${frontServerIP}${redirect}`);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  youtube.channels.list({
     "part": "snippet",
     "mine": "true"
-  });
-
-  const callback = async (error, response) => {
-
-  }
-
-  console.log(response)
-
-  const channelID = response.data.items[0].id;
-  const channelLink = `https://www.youtube.com/channel/${channelId}`;
-  const profilePicture = response.data.items[0].snippet.thumbnails.default.url;
-  const channelName = response.data.items[0].snippet.localized.title;
-
-  let contentOutlet = await axios.post(`${dbServerIP}outlet`, {
-    fields: {
-      channelID,
-      channelLink,
-      profilePicture,
-      channelName,
-      owner: {
-        ownerType: userType,
-        ownerID: userID
-      }
-    }
-  });
-
-  if (contentOutlet)
-    contentOutlet = contentOutlet.data;
-
-  const coToken = new COToken({
-    token: {
-      token,
-      refreshToken,
-      expires
-     },
-    owner: contentOutlet._id
-  });
-
-  await coToken.save();
-
-  res.status(307).redirect(`${frontServerIP}${redirect}`);
+  }, callback);
 }
 
 // GET /login
