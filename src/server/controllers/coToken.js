@@ -51,6 +51,17 @@ const getToken = async (req, res, next) => {
 const storeToken = async (req, res, next) => {
   const { token, contentOutlet } = req.body;
 
+  const newToken = new COToken({ token, contentOutlet });
+
+  await newToken.save();
+
+  await res.send(newToken.toObject({ depopulate: true }));
+};
+
+// PATCH /cotoken
+const updateToken = async (req, res, next) => {
+  const { token, contentOutlet } = req.body;
+
   let coToken;
 
   coToken = await COToken.findOne({ contentOutlet });
@@ -67,5 +78,6 @@ const storeToken = async (req, res, next) => {
 
 module.exports = {
   getToken,
-  storeToken
+  storeToken,
+  updateToken
 };

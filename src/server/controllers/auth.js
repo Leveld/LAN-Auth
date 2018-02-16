@@ -3,7 +3,7 @@ const base64 = require('base64-url');
 const { google } = require('googleapis');
 const plus = google.plus('v1');
 const OAuth2Client = google.auth.OAuth2;
-const { asyncMiddleware, frontServerIP, authServerIP, dbServerIP, } = require('capstone-utils');
+const { frontServerIP, authServerIP, dbServerIP } = require('capstone-utils');
 
 const { clientID, clientSecret, managementToken } = require('../secret.json');
 const { COToken } = require('../models');
@@ -79,6 +79,13 @@ const googleCallback = async (req, res, next) => {
       const profilePicture = response.data.items[0].snippet.thumbnails.default.url;
       const channelName = response.data.items[0].snippet.localized.title;
 
+      console.log(`ChannelID: ${channelID}`)
+      console.log(`channelLink: ${channelLink}`)
+      console.log(`profilePicture: ${profilePicture}`)
+      console.log(`channelName: ${channelName}`)
+      console.log(`items: ${JSON.stringify(response.data.items[0], null, 2)}`)
+
+      // create ContentOutlet
       let contentOutlet = await axios.post(`${dbServerIP}outlet`, {
         fields: {
           channelID,
@@ -95,7 +102,8 @@ const googleCallback = async (req, res, next) => {
       if (contentOutlet)
         contentOutlet = contentOutlet.data;
 
-      const coToken = new COToken({
+      // create token in AuthDB
+      await axios.post(`${authServerIP}cotoken`, {
         token: {
           token,
           refreshToken,
@@ -104,7 +112,12 @@ const googleCallback = async (req, res, next) => {
         contentOutlet: contentOutlet._id
       });
 
-      await coToken.save();
+      // add ContentOutlet to user
+      await axios.patch(`${dbServerIP}user/co`, {
+        id: userID,
+        type: userType,
+        contentOutlet: contentOutlet._id
+      });
 
       await res.status(307).redirect(`${frontServerIP}${redirect}`);
     } catch (error) {

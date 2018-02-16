@@ -10,13 +10,13 @@ const getToken = async (req, res, next) => {
     const { token } = req.query;
     // If the token doesn't exist, error
     if (!token)
-      return await res.status(400).json({ status: false, message: 'Missing Data' });
+      return await res.status(400).json({ status: false, message: 'Missing Data', received: req.query });
     // find the token in the database
     // couldn't figure out if you could use async/await with this
     const tokenDoc = await AuthToken.findOne({ 'token.token': token });
     // Send error if there was a not found or other error
     if (!tokenDoc)
-      return await res.status(422).send({ status: false, message: 'Data Not Found' });
+      return await res.status(422).send({ status: false, message: 'GET /token Data Not Found' });
     // do the thing and return it
     // expired?
     if (new Date(tokenDoc.token.expires) <= Date.now()) {
@@ -40,7 +40,7 @@ const storeToken = async (req, res, next) => {
   // return status error and error message
   // first, verify token
   if (!token || !email || !emailVerified || !expires)
-    await res.status(400).json({ status: false, message: 'Missing Data' });
+    await res.status(400).json({ status: false, message: 'Missing Data', received: req.body });
   //TODO verify token
   //TODO verify email
   // Get userid for email
@@ -72,25 +72,25 @@ const storeToken = async (req, res, next) => {
     await newAuthToken.save();
     return await res.send(newAuthToken);
   } catch (error) {
-    return await res.status(400).json({ status: false, message: 'Missing Data' });
+    return await res.status(400).json({ status: false, message: 'Missing Data', received: req.body });
   }
 };
 
 const updateToken = async (req, res, next) => {
-  const { id, fields } = req.body;
+  const { token, fields } = req.body;
 
   if(typeof id !== 'string' || typeof fields !== 'object')
-    await res.status(400).json({ status: false, message: 'Missing Data' });
+    await res.status(400).json({ status: false, message: 'Missing Data', received: req.body });
 
   try {
-    const token = await AuthToken.findOne({ _id: id });
+    const authToken = await AuthToken.findOne({ 'token.token': token });
 
     for (let [key, value] of Object.entries(fields)) {
-      token[key] = value;
+      authToken[key] = value;
     }
 
-    await token.save();
-    await res.send(token.toObject({ depopulate: true }));
+    await authToken.save();
+    await res.send(authToken.toObject({ depopulate: true }));
 
   } catch (error) {
     return await res.status(400).json({ status: false, message: 'Token malformed or does not exist' });
@@ -101,10 +101,10 @@ const updateToken = async (req, res, next) => {
 // GET /tokenExpired
 const isTokenExpired = async (req, res, next) => {
   try {
-    // Get the token from the params
-    const { token } = req.params;
+    // Get the token from the query
+    const { token } = req.query;
     // If the token doesn't exist, error
-    if (!token) await re.status(400).json({ status: false, message: 'Missing Data' });
+    if (!token) await re.status(400).json({ status: false, message: 'Missing Data', received: req.query });
     // find the token in the database
     const tokenData = await axios.get(`${authServerIP}/token`, { params: { token } });
     // check status of request for status of token
