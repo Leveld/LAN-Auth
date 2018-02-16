@@ -10,7 +10,7 @@ const { clientID, clientSecret, managementToken } = require('../secret.json');
 const oauth2Client = new OAuth2Client(
   '660421589652-k537cl8vg3v8imub4culbjon6f20fph6.apps.googleusercontent.com',
   'yYuc3V2fIT4DOfnZXIyhBvsh',
-  `http://localhost:3002/oauth`
+  `http://localhost:3002/goauth`
 );
 
 google.options({ auth: oauth2Client });
@@ -19,12 +19,14 @@ google.options({ auth: oauth2Client });
 const generateURL = async (req, res, next) => {
   const { type = '', redirect = '', userID = '', userType = '' } = req.query;
 
+  console.log('hit', type, redirect, userID, userType);
+
   // TODO check type and redirect and user and userType are strings.
-  const state = base64.encode({
+  const state = base64.encode(JSON.stringify({
     redirect,
     userID,
     userType
-  });
+  }));
   switch(type.toLowerCase()) {
     case 'google':
       const scopes = [
@@ -50,11 +52,14 @@ const generateURL = async (req, res, next) => {
 const googleCallback = async (req, res, next) => {
   const { state, code } = req.query;
 
-  const { redirect = '', userID, userType } = base64.decode(state);
+  const { redirect = '', userID, userType } = JSON.parse(base64.decode(state));
 
   // TODO check that we have userID and userType
 
-  const tokens = await oauth2Client.getToken(code);
+  let tokens = await oauth2Client.getToken(code);
+  if (!tokens)
+    throwError('GOAuthError', `Couldn't get tokens.`);
+  tokens = tokens.tokens;
   const token = tokens.access_token;
   const refreshToken = tokens.refresh_token;
   const expires = new Date(tokens.expiry_date).toISOString();
@@ -65,15 +70,21 @@ const googleCallback = async (req, res, next) => {
     version: 'v3'
   });
 
-  const res = await youtube.channels.list({
+  await youtube.channels.list({
     "part": "snippet",
     "mine": "true"
   });
 
-  const channelID = res.data.items[0].id;
+  const callback = async (error, response) => {
+
+  }
+
+  console.log(response)
+
+  const channelID = response.data.items[0].id;
   const channelLink = `https://www.youtube.com/channel/${channelId}`;
-  const profilePicture = res.data.items[0].snippet.thumbnails.default.url;
-  const channelName = res.data.items[0].snippet.localized.title;
+  const profilePicture = response.data.items[0].snippet.thumbnails.default.url;
+  const channelName = response.data.items[0].snippet.localized.title;
 
   let contentOutlet = await axios.post(`${dbServerIP}outlet`, {
     fields: {
@@ -179,6 +190,7 @@ const loginCallback = async (req, res, next) => {
 };
 
 module.exports = {
-  getOAuth,
+  generateURL,
+  googleCallback,
   loginCallback
 };

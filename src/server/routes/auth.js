@@ -3,8 +3,12 @@ const controllers = require('../controllers');
 
 module.exports = (app) => {
   app
-    .route('/oauth')
-    .get(asyncMiddleware(controllers.auth.getOAuth));
+    .route('/coURL')
+    .get(asyncMiddleware(controllers.auth.generateURL));
+
+  app
+    .route('/goauth')
+    .get(asyncMiddleware(controllers.auth.googleCallback));
 
   app
     .route('/login')

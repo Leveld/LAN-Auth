@@ -7,7 +7,7 @@ const OAuth2Client = google.auth.OAuth2;
 const oauth2Client = new OAuth2Client(
   '660421589652-k537cl8vg3v8imub4culbjon6f20fph6.apps.googleusercontent.com',
   'yYuc3V2fIT4DOfnZXIyhBvsh',
-  'http://localhost:3002/oauth'
+  'http://localhost:3002/goauth'
 );
 
 const error = (name, message, status = USER_ERROR) => {
@@ -17,6 +17,7 @@ const error = (name, message, status = USER_ERROR) => {
   throw error;
 };
 
+// GET /cotoken
 const getToken = async (req, res, next) => {
   const { contentOutlet } = req.query;
   const doc = await COToken.findOne({ contentOutlet });
@@ -35,7 +36,7 @@ const getToken = async (req, res, next) => {
     let newTokens = await oauth2Client.refreshAccessToken();
     if(newTokens)
       newTokens = newTokens.credentials;
-    else 
+    else
       throwError('AuthCoTokenError', 'Could not refresh tokens');
     doc.token.token = newTokens.access_token;
     doc.token.expires = new Date(newTokens.expiry_date).toISOString();
@@ -45,6 +46,8 @@ const getToken = async (req, res, next) => {
   await res.send(token.toObject({ depopulate: true }));
 };
 
+
+// POST /cotoken
 const storeToken = async (req, res, next) => {
   const { token, contentOutlet } = req.body;
 
