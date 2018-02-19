@@ -3,7 +3,7 @@ const base64 = require('base64-url');
 const { google } = require('googleapis');
 const plus = google.plus('v1');
 const OAuth2Client = google.auth.OAuth2;
-const { frontServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT } = require('capstone-utils');
+const { frontServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, throwError } = require('capstone-utils');
 
 const { clientID, clientSecret, managementToken } = require('../secret.json');
 const { COToken } = require('../models');
@@ -20,7 +20,8 @@ google.options({ auth: oauth2Client });
 const generateURL = async (req, res, next) => {
   const { type = '', redirect = '', userID = '', userType = '' } = req.query;
 
-  // TODO check type and redirect and user and userType are strings.
+  if(typeof type !== 'string' && typeof redirect !== 'string' && typeof userID !== 'string' && typeof userType !== 'string')
+    throwError('GOAuthError', 'type, redirect, userID, and userType must be strings');
   const state = base64.encode(JSON.stringify({
     redirect,
     userID,
@@ -43,13 +44,15 @@ const generateURL = async (req, res, next) => {
 
       return await res.send({ url });
     default:
-      return await res.send('not found'); // TODO make it an error
+      throwError('GOAuthError', 'invalid type parameter');
   }
 }
 
 // GET /goauth
 const googleCallback = async (req, res, next) => {
   const { state, code } = req.query;
+  if (!state || !code)
+    throwError('GOAuthError', `Missing Data | received: ${JSON.stringify(req.query)}`);
 
   const { redirect = '', userID, userType } = JSON.parse(base64.decode(state));
 
