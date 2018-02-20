@@ -10,20 +10,13 @@ const oauth2Client = new OAuth2Client(
   'http://localhost:3002/goauth'
 );
 
-const error = (name, message, status = USER_ERROR) => {
-  const error = new Error(message);
-  error.name = name;
-  error.status = status;
-  throw error;
-};
-
 // GET /cotoken
 const getToken = async (req, res, next) => {
   const { contentOutlet } = req.query;
   const doc = await COToken.findOne({ contentOutlet });
 
   if (!doc)
-    error('AuthCoToken', 'No Token found for specified ContentOutlet.');
+    throwError('AuthCoToken', 'No Token found for specified ContentOutlet.');
 
   const { token : access_token, refreshToken : refresh_token, expires : expiry_date } = doc.token;
 
