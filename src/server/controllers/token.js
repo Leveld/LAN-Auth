@@ -35,7 +35,7 @@ const storeToken = async (req, res, next) => {
   // Error if either does not exist:
   // return status error and error message
   // first, verify token
-  if (!token || !email || !emailVerified || !expires)
+  if (!token || !email || typeof emailVerified !== 'boolean' || !expires)
     throwError('AuthTokenError', `Missing Data | received: ${JSON.stringify(req.body)}`);
   //TODO verify token
   //TODO verify email
