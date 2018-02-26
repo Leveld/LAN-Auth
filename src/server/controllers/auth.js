@@ -5,12 +5,12 @@ const plus = google.plus('v1');
 const OAuth2Client = google.auth.OAuth2;
 const { frontServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, throwError, googleRedirect } = require('capstone-utils');
 
-const { clientID, clientSecret, managementToken } = require('../secret.json');
+const { clientID, clientSecret, managementToken, googleClientID, googleClientSecret } = require('../secret.json');
 const { COToken } = require('../models');
 
 const oauth2Client = new OAuth2Client(
-  '660421589652-k537cl8vg3v8imub4culbjon6f20fph6.apps.googleusercontent.com',
-  'yYuc3V2fIT4DOfnZXIyhBvsh',
+  googleClientID,
+  googleClientSecret,
   googleRedirect
 );
 
