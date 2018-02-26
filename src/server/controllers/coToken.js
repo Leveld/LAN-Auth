@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { USER_ERROR, authServerIP, throwError } = require('capstone-utils');
+const { USER_ERROR, authServerIP, throwError, googleRedirect } = require('capstone-utils');
 const { google } = require('googleapis');
 const { COToken } = require('../models');
 
@@ -7,7 +7,7 @@ const OAuth2Client = google.auth.OAuth2;
 const oauth2Client = new OAuth2Client(
   '660421589652-k537cl8vg3v8imub4culbjon6f20fph6.apps.googleusercontent.com',
   'yYuc3V2fIT4DOfnZXIyhBvsh',
-  'http://localhost:3002/goauth'
+  googleRedirect
 );
 
 // GET /cotoken
