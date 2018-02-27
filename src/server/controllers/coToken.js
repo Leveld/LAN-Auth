@@ -13,11 +13,13 @@ const oauth2Client = new OAuth2Client(
 
 // GET /cotoken
 const getToken = async (req, res, next) => {
-  const { contentOutlet } = req.query;
+  let { contentOutlet } = req.query;
   const doc = await COToken.findOne({ contentOutlet });
 
   if (!doc)
-    throwError('AuthCoToken', 'No Token found for specified ContentOutlet.');
+    throwError('AuthCoToken', `No Token found for specified ContentOutlet '${contentOutlet}'`);
+
+  console.log(doc)
 
   const { token : access_token, refreshToken : refresh_token, expires : expiry_date } = doc.token;
 
@@ -37,13 +39,16 @@ const getToken = async (req, res, next) => {
     await doc.save();
   }
 
-  await res.send(token.toObject({ depopulate: true }));
+  await res.send(doc.token);
 };
 
 
 // POST /cotoken
 const storeToken = async (req, res, next) => {
   const { token, contentOutlet } = req.body;
+
+  console.log(`token: ${JSON.stringify(token)}`);
+  console.log(`contentOutlet: ${contentOutlet}`);
 
   const newToken = new COToken({ token, contentOutlet });
 

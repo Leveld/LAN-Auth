@@ -16,7 +16,7 @@ const COToken = mongoose.Schema({
     }
   },
   contentOutlet: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     required: true
   }
 });
