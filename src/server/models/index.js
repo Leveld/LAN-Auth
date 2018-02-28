@@ -1,5 +1,4 @@
-// authToken Model
-const AuthToken = require('./authToken');
+const AuthToken = require('./AuthToken');
 const COToken = require('./COToken');
 
 module.exports = {
