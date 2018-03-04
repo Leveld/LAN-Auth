@@ -14,13 +14,20 @@ const oauth2Client = new OAuth2Client(
 // GET /cotoken
 const getToken = async (req, res, next) => {
   let { contentOutlet } = req.query;
+
+  if (contentOutlet.startsWith('"')) {
+    contentOutlet = contentOutlet.substring(1);
+  }
+  if (contentOutlet.endsWith('"')) {
+    contentOutlet = contentOutlet.substring(0, contentOutlet.length - 1);
+  }
+
   const doc = await COToken.findOne({ contentOutlet });
 
   if (!doc)
     throwError('AuthCoToken', `No Token found for specified ContentOutlet '${contentOutlet}'`);
 
-  console.log(doc)
-
+  
   const { token : access_token, refreshToken : refresh_token, expires : expiry_date } = doc.token;
 
   if((expiry_date - new Date()) <= (60 * 1000)) {
@@ -38,7 +45,7 @@ const getToken = async (req, res, next) => {
     doc.token.expires = new Date(newTokens.expiry_date).toISOString();
     await doc.save();
   }
-
+  console.log('doc is 2 ' + doc);
   await res.send(doc.token);
 };
 
