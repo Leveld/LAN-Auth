@@ -1,0 +1,28 @@
+{
+  "name": "capstone-auth",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node src/server/server.js",
+    "watch": "nodemon src/server/server.js",
+    "dev-win": "start npm run mongo && npm run watch",
+    "dev-unix": "npm run mongo & npm run watch",
+    "devw": "npm run dev-win",
+    "devm": "npm run dev-unix",
+    "devl": "npm run dev-unix",
+    "mongo": "title mongo && mongod --dbpath data/db --port 2000"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "base64-url": "^2.1.0",
+    "body-parser": "^1.18.2",
+    "capstone-utils": "github:Leveld/LAN-Utils",
+    "eslint": "^3.17.1",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0",
+    "eslint-plugin-react": "^6.9.0",
+    "express": "^4.16.2",
+    "googleapis": "^26.0.1",
+    "mongoose": "^5.0.4"
+  }
+}
