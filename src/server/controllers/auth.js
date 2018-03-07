@@ -3,8 +3,7 @@ const base64 = require('base64-url');
 const { google } = require('googleapis');
 const plus = google.plus('v1');
 const OAuth2Client = google.auth.OAuth2;
-const { frontServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, throwError, googleRedirect } = require('capstone-utils');
-
+const { frontServerIP, apiServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, throwError, googleRedirect } = require('capstone-utils');
 const { clientID, clientSecret, managementToken, googleClientID, googleClientSecret } = require('../secret.json');
 const { COToken } = require('../models');
 
@@ -55,7 +54,6 @@ const googleCallback = async (req, res, next) => {
     throwError('GOAuthError', `Missing Data | received: ${JSON.stringify(req.query)}`);
 
   const { redirect = '', userID, userType } = JSON.parse(base64.decode(state));
-  console.log(`Google callback: userID:   ${userID}   userType: ${userType}`)
 
   // TODO check that we have userID and userType
 
@@ -78,12 +76,8 @@ const googleCallback = async (req, res, next) => {
   }
  });
 
-  console.log('contentOutlet created')
-
   if (contentOutlet)
     contentOutlet = contentOutlet.data;
-
-  console.log(`contentOutlet: ${JSON.stringify(contentOutlet)}`);
 
   // create token in AuthDB
   await axios.post(`${authServerIP}cotoken`, {
@@ -94,10 +88,6 @@ const googleCallback = async (req, res, next) => {
      },
     contentOutlet: contentOutlet._id
   });
-
-  console.log('content token created')
-
-  console.log(`userID: ${userID} | type: ${userType}`)
 
   // get contentOutlet info
   let coInfo = await axios.get(`${dbServerIP}coInfo`, {
@@ -124,7 +114,7 @@ const googleCallback = async (req, res, next) => {
     contentOutlet: contentOutlet._id
   });
 
-  console.log('contentoutlet added to user')
+  await axios.get(`${apiServerIP}clearCache`);
 
   await res.status(307).redirect(`${frontServerIP}${redirect}`);
 }
