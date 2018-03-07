@@ -55,6 +55,7 @@ const googleCallback = async (req, res, next) => {
     throwError('GOAuthError', `Missing Data | received: ${JSON.stringify(req.query)}`);
 
   const { redirect = '', userID, userType } = JSON.parse(base64.decode(state));
+  console.log(`Google callback: userID:   ${userID}   userType: ${userType}`)
 
   // TODO check that we have userID and userType
 
@@ -68,7 +69,14 @@ const googleCallback = async (req, res, next) => {
   const expires = new Date(tokens.expiry_date).toISOString();
 
   // create the ContentOutlet
- let contentOutlet = await axios.post(`${dbServerIP}outlet`);
+ let contentOutlet = await axios.post(`${dbServerIP}outlet`, {
+  fields: {
+    owner: {
+      ownerType: userType,
+      ownerID: userID
+    }
+  }
+ });
 
   console.log('contentOutlet created')
 
@@ -103,12 +111,7 @@ const googleCallback = async (req, res, next) => {
   // add the info to the contentOutlet
   contentOutlet = await axios.patch(`${dbServerIP}outlet`, {
     id: contentOutlet._id,
-    fields: Object.assign(coInfo, {
-      owner: {
-        ownerType: userType,
-        ownerID: userID
-      }
-    })
+    fields: coInfo
   });
 
   if (contentOutlet)
