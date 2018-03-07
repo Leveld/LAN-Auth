@@ -3,15 +3,15 @@ const base64 = require('base64-url');
 const { google } = require('googleapis');
 const plus = google.plus('v1');
 const OAuth2Client = google.auth.OAuth2;
-const { frontServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, throwError } = require('capstone-utils');
+const { frontServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, throwError, googleRedirect } = require('capstone-utils');
 
-const { clientID, clientSecret, managementToken } = require('../secret.json');
+const { clientID, clientSecret, managementToken, googleClientID, googleClientSecret } = require('../secret.json');
 const { COToken } = require('../models');
 
 const oauth2Client = new OAuth2Client(
-  '660421589652-k537cl8vg3v8imub4culbjon6f20fph6.apps.googleusercontent.com',
-  'yYuc3V2fIT4DOfnZXIyhBvsh',
-  `http://localhost:3002/goauth`
+  googleClientID,
+  googleClientSecret,
+  googleRedirect
 );
 
 google.options({ auth: oauth2Client });
@@ -62,84 +62,68 @@ const googleCallback = async (req, res, next) => {
   if (!tokens)
     throwError('GOAuthError', `Couldn't get tokens.`);
   tokens = tokens.tokens;
+
   const token = tokens.access_token;
   const refreshToken = tokens.refresh_token;
   const expires = new Date(tokens.expiry_date).toISOString();
 
-  oauth2Client.setCredentials(tokens);
+  // create the ContentOutlet
+ let contentOutlet = await axios.post(`${dbServerIP}outlet`);
 
-  const youtube = google.youtube({
-    version: 'v3'
+  console.log('contentOutlet created')
+
+  if (contentOutlet)
+    contentOutlet = contentOutlet.data;
+
+  console.log(`contentOutlet: ${JSON.stringify(contentOutlet)}`);
+
+  // create token in AuthDB
+  await axios.post(`${authServerIP}cotoken`, {
+    token: {
+      token,
+      refreshToken,
+      expires
+     },
+    contentOutlet: contentOutlet._id
   });
 
-  const callback = async (error, response) => {
-    try {
-      if (error)
-        throw error;
+  console.log('content token created')
 
-      const channelID = response.data.items[0].id;
-      const channelLink = `https://www.youtube.com/channel/${channelID}`;
-      const profilePicture = response.data.items[0].snippet.thumbnails.default.url;
-      const channelName = response.data.items[0].snippet.localized.title;
+  console.log(`userID: ${userID} | type: ${userType}`)
 
-      console.log(`ChannelID: ${channelID}`)
-      console.log(`channelLink: ${channelLink}`)
-      console.log(`profilePicture: ${profilePicture}`)
-      console.log(`channelName: ${channelName}`)
-      console.log(`items: ${JSON.stringify(response.data.items[0], null, 2)}`)
-
-      // create ContentOutlet
-      let contentOutlet = await axios.post(`${dbServerIP}outlet`, {
-        fields: {
-          channelID,
-          channelLink,
-          profilePicture,
-          channelName,
-          owner: {
-            ownerType: userType,
-            ownerID: userID
-          }
-        }
-      });
-
-      console.log('contentOutlet created')
-
-      if (contentOutlet)
-        contentOutlet = contentOutlet.data;
-
-      // create token in AuthDB
-      await axios.post(`${authServerIP}cotoken`, {
-        token: {
-          token,
-          refreshToken,
-          expires
-         },
-        contentOutlet: contentOutlet._id
-      });
-
-      console.log('content token created')
-
-      console.log(`userID: ${userID} | type: ${userType}`)
-
-      // add ContentOutlet to user
-      await axios.patch(`${dbServerIP}user/co`, {
-        id: userID,
-        type: userType,
-        contentOutlet: contentOutlet._id
-      });
-
-      console.log('contentoutlet added to user')
-
-      await res.status(307).redirect(`${frontServerIP}${redirect}`);
-    } catch (error) {
-      next(error);
+  // get contentOutlet info
+  let coInfo = await axios.get(`${dbServerIP}coInfo`, {
+    params: {
+      id: contentOutlet._id
     }
-  };
+  });
+  if (coInfo)
+    coInfo = coInfo.data;
 
-  youtube.channels.list({
-    "part": "snippet",
-    "mine": "true"
-  }, callback);
+  // add the info to the contentOutlet
+  contentOutlet = await axios.patch(`${dbServerIP}outlet`, {
+    id: contentOutlet._id,
+    fields: Object.assign(coInfo, {
+      owner: {
+        ownerType: userType,
+        ownerID: userID
+      }
+    })
+  });
+
+  if (contentOutlet)
+    contentOutlet = contentOutlet.data;
+
+  // add ContentOutlet to user
+  await axios.patch(`${dbServerIP}user/co`, {
+    id: userID,
+    type: userType,
+    contentOutlet: contentOutlet._id
+  });
+
+  console.log('contentoutlet added to user')
+
+  await res.status(307).redirect(`${frontServerIP}${redirect}`);
 }
 
 // GET /login
@@ -172,14 +156,9 @@ const loginCallback = async (req, res, next) => {
   const { email_verified, email, updated_at, name,  picture, user_id, created_at } = userInfo = info.data;
   let newUser = false;
 
-  try {
-    await axios.get(`${dbServerIP}user?email=${email}`);
-    //user exists
-  } catch (error) {
-    // user doesn't exist
-    // TODO add support for other errors that could occur
-    // instead of just assuming that the error is from
-    // a user not existing
+  let existingUser = await axios.get(`${dbServerIP}user?email=${email}`);
+
+  if (!existingUser || !existingUser.data) {
     await axios.post(`${dbServerIP}user`, {
       email,
       fields: {
@@ -198,7 +177,7 @@ const loginCallback = async (req, res, next) => {
     expires: new Date((new Date() / 1) + (1000 * expires_in)).toISOString()
   });
 
-  console.log(access_token);
+  console.log(`Login: access_token=${access_token}`);
 
   const domain = /^(https?:\/\/)?([^:^\/]*)(:[0-9]*)(\/[^#^?]*)(.*)/g.exec(frontServerIP);
 

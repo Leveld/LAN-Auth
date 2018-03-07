@@ -1,23 +1,33 @@
 const axios = require('axios');
-const { USER_ERROR, authServerIP, throwError } = require('capstone-utils');
+const { USER_ERROR, authServerIP, throwError, googleRedirect } = require('capstone-utils');
 const { google } = require('googleapis');
 const { COToken } = require('../models');
+const { googleClientID, googleClientSecret } = require('../secret.json');
 
 const OAuth2Client = google.auth.OAuth2;
 const oauth2Client = new OAuth2Client(
-  '660421589652-k537cl8vg3v8imub4culbjon6f20fph6.apps.googleusercontent.com',
-  'yYuc3V2fIT4DOfnZXIyhBvsh',
-  'http://localhost:3002/goauth'
+  googleClientID,
+  googleClientSecret,
+  googleRedirect
 );
 
 // GET /cotoken
 const getToken = async (req, res, next) => {
-  const { contentOutlet } = req.query;
+  let { contentOutlet } = req.query;
+
+  if (contentOutlet.startsWith('"')) {
+    contentOutlet = contentOutlet.substring(1);
+  }
+  if (contentOutlet.endsWith('"')) {
+    contentOutlet = contentOutlet.substring(0, contentOutlet.length - 1);
+  }
+
   const doc = await COToken.findOne({ contentOutlet });
 
   if (!doc)
-    throwError('AuthCoToken', 'No Token found for specified ContentOutlet.');
+    throwError('AuthCoToken', `No Token found for specified ContentOutlet '${contentOutlet}'`);
 
+  
   const { token : access_token, refreshToken : refresh_token, expires : expiry_date } = doc.token;
 
   if((expiry_date - new Date()) <= (60 * 1000)) {
@@ -35,14 +45,17 @@ const getToken = async (req, res, next) => {
     doc.token.expires = new Date(newTokens.expiry_date).toISOString();
     await doc.save();
   }
-
-  await res.send(token.toObject({ depopulate: true }));
+  console.log('doc is 2 ' + doc);
+  await res.send(doc.token);
 };
 
 
 // POST /cotoken
 const storeToken = async (req, res, next) => {
   const { token, contentOutlet } = req.body;
+
+  console.log(`token: ${JSON.stringify(token)}`);
+  console.log(`contentOutlet: ${contentOutlet}`);
 
   const newToken = new COToken({ token, contentOutlet });
 

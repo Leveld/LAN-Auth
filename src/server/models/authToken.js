@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const authTokenSchema = new mongoose.Schema({
+const AuthToken = new mongoose.Schema({
   user: {
     userID: {
       type: String,
@@ -27,4 +27,4 @@ const authTokenSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('AuthToken', authTokenSchema);
+module.exports = mongoose.model('AuthToken', AuthToken);
