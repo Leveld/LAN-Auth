@@ -21,6 +21,8 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.get('/wat', (req, res) => res.send(IS_PRODUCTION ? 'Production' : 'Development'));
+
 routes(app);
 
 app.listen(PORT, () => {
