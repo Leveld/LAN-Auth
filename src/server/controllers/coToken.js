@@ -52,8 +52,6 @@ const getToken = async (req, res, next) => {
 const storeToken = async (req, res, next) => {
   const { token, contentOutlet } = req.body;
 
-  console.log(`token: ${JSON.stringify(token)}`);
-  console.log(`contentOutlet: ${contentOutlet}`);
 
   const newToken = new COToken({ token, contentOutlet });
 
