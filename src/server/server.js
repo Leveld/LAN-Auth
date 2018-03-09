@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const { IS_PRODUCTION } = require('capstone-utils');
 
 const routes = require('./routes');
 
@@ -10,7 +11,10 @@ const { AuthToken } = require('./models');
 const PORT = process.env.PORT || '3002';
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:2000/capstone-auth');
+if (IS_PRODUCTION)
+  mongoose.connect('mongodb://process.env.DBUSER:process.env.DBPASSWORD@ds147274.mlab.com:47274/heroku_nf63v9rv');
+else
+  mongoose.connect('mongodb://localhost:2000/capstone-auth');
 
 const app = express();
 
