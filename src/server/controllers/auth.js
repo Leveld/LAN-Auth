@@ -17,6 +17,11 @@ google.options({ auth: oauth2Client });
 
 // GET /coURL
 const generateURL = async (req, res, next) => {
+  console.log('clientID', clientID);
+  console.log('clientSecret', clientSecret);
+  console.log('googleClientID', googleClientID);
+  console.log('googleClientSecret', googleClientSecret);
+
   const { type = '', redirect = '', userID = '', userType = '' } = req.query;
 
   if(typeof type !== 'string' && typeof redirect !== 'string' && typeof userID !== 'string' && typeof userType !== 'string')
