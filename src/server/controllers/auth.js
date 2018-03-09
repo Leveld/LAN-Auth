@@ -3,7 +3,7 @@ const base64 = require('base64-url');
 const { google } = require('googleapis');
 const plus = google.plus('v1');
 const OAuth2Client = google.auth.OAuth2;
-const { frontServerIP, apiServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, throwError, googleRedirect } = require('capstone-utils');
+const { frontServerIP, apiServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, IS_PRODUCTION, throwError, googleRedirect } = require('capstone-utils');
 const { clientID, clientSecret, managementToken, googleClientID, googleClientSecret } = require('../secret.json');
 const { COToken } = require('../models');
 
@@ -146,7 +146,7 @@ const loginCallback = async (req, res, next) => {
     },
     withCredentials: true
   });
-  const { email_verified, email, updated_at, name,  picture, user_id, created_at } = userInfo = info.data;
+  const { email_verified, email, updated_at, name, picture, user_id, created_at } = userInfo = info.data;
   let newUser = false;
 
   let existingUser = await axios.get(`${dbServerIP}user?email=${email}`);
@@ -156,6 +156,7 @@ const loginCallback = async (req, res, next) => {
       email,
       fields: {
         name,
+        profilePicture: picture || '',
         createdAt: created_at,
         auth0ID: sub
       }
@@ -174,7 +175,7 @@ const loginCallback = async (req, res, next) => {
 
   const domain = /^(https?:\/\/)?([^:^\/]*)(:[0-9]*)(\/[^#^?]*)(.*)/g.exec(frontServerIP);
 
-  if (email_verified || IS_DEVELOPMENT)
+  if (email_verified || IS_DEVELOPMENT || IS_PRODUCTION)
     await res
           .status(307)
           .cookie('access_token', access_token, {
