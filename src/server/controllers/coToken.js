@@ -27,7 +27,6 @@ const getToken = async (req, res, next) => {
   if (!doc)
     throwError('AuthCoToken', `No Token found for specified ContentOutlet '${contentOutlet}'`);
 
-  
   const { token : access_token, refreshToken : refresh_token, expires : expiry_date } = doc.token;
 
   if((expiry_date - new Date()) <= (60 * 1000)) {
@@ -45,7 +44,6 @@ const getToken = async (req, res, next) => {
     doc.token.expires = new Date(newTokens.expiry_date).toISOString();
     await doc.save();
   }
-  console.log('doc is 2 ' + doc);
   await res.send(doc.token);
 };
 

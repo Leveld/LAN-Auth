@@ -3,8 +3,7 @@ const base64 = require('base64-url');
 const { google } = require('googleapis');
 const plus = google.plus('v1');
 const OAuth2Client = google.auth.OAuth2;
-const { frontServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, throwError, googleRedirect } = require('capstone-utils');
-
+const { frontServerIP, apiServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, throwError, googleRedirect } = require('capstone-utils');
 const { clientID, clientSecret, managementToken, googleClientID, googleClientSecret } = require('../secret.json');
 const { COToken } = require('../models');
 
@@ -68,14 +67,17 @@ const googleCallback = async (req, res, next) => {
   const expires = new Date(tokens.expiry_date).toISOString();
 
   // create the ContentOutlet
- let contentOutlet = await axios.post(`${dbServerIP}outlet`);
-
-  console.log('contentOutlet created')
+ let contentOutlet = await axios.post(`${dbServerIP}outlet`, {
+  fields: {
+    owner: {
+      ownerType: userType,
+      ownerID: userID
+    }
+  }
+ });
 
   if (contentOutlet)
     contentOutlet = contentOutlet.data;
-
-  console.log(`contentOutlet: ${JSON.stringify(contentOutlet)}`);
 
   // create token in AuthDB
   await axios.post(`${authServerIP}cotoken`, {
@@ -86,10 +88,6 @@ const googleCallback = async (req, res, next) => {
      },
     contentOutlet: contentOutlet._id
   });
-
-  console.log('content token created')
-
-  console.log(`userID: ${userID} | type: ${userType}`)
 
   // get contentOutlet info
   let coInfo = await axios.get(`${dbServerIP}coInfo`, {
@@ -103,12 +101,7 @@ const googleCallback = async (req, res, next) => {
   // add the info to the contentOutlet
   contentOutlet = await axios.patch(`${dbServerIP}outlet`, {
     id: contentOutlet._id,
-    fields: Object.assign(coInfo, {
-      owner: {
-        ownerType: userType,
-        ownerID: userID
-      }
-    })
+    fields: coInfo
   });
 
   if (contentOutlet)
@@ -121,7 +114,7 @@ const googleCallback = async (req, res, next) => {
     contentOutlet: contentOutlet._id
   });
 
-  console.log('contentoutlet added to user')
+  await axios.get(`${apiServerIP}clearCache`);
 
   await res.status(307).redirect(`${frontServerIP}${redirect}`);
 }
