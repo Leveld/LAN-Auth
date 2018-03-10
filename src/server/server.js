@@ -11,7 +11,7 @@ const { AuthToken } = require('./models');
 const PORT = process.env.PORT || '3002';
 
 mongoose.Promise = global.Promise;
-if (IS_PRODUCTION)
+if (process.env.USE_HEROKU)
   mongoose.connect(`${process.env.MONGODB_URI}`);
 else
   mongoose.connect('mongodb://localhost:2000/capstone-auth');
