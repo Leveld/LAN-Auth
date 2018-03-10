@@ -5,13 +5,22 @@ const { IS_PRODUCTION } = require('capstone-utils');
 
 const routes = require('./routes');
 
+const USE_HEROKU = (() => {
+  if (typeof process.env.USE_HEROKU === 'string') {
+    if (process.env.USE_HEROKU.toLowerCase() === 'true')
+      return true;
+  if (process.env.USE_HEROKU === 1 || process.env.USE_HEROKU === true)
+    return true;
+  return false;
+})();
+
 // initialize models
-const { AuthToken } = require('./models');
+const { AuthToken, COToken } = require('./models');
 
 const PORT = process.env.PORT || '3002';
 
 mongoose.Promise = global.Promise;
-if (process.env.USE_HEROKU)
+if (USE_HEROKU)
   mongoose.connect(`${process.env.MONGODB_URI}`);
 else
   mongoose.connect('mongodb://localhost:2000/capstone-auth');
