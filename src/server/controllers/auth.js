@@ -180,7 +180,7 @@ const loginCallback = async (req, res, next) => {
 
   console.log(`Login: access_token=${access_token}`);
 
-  const domain = /^(https?:\/\/)?([^:^\/]*)(:[0-9]*)(\/[^#^?]*)(.*)/g.exec(frontServerIP);
+  const domain = /^(https?:\/\/)?([^:^\/]*)(:[0-9]*)?(\/[^#^?]*)(.*)/g.exec(frontServerIP);
 
   if (email_verified || IS_DEVELOPMENT || IS_PRODUCTION)
     await res
