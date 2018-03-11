@@ -191,10 +191,8 @@ const loginCallback = async (req, res, next) => {
               maxAge: 604800
             })
             .redirect(url.format({
-              pathname:`${frontServerIP}${newUser ? 'register' : ''}`,
-              query: {
-                user: jwt.sign({ access_token }, clientSecret)
-              }
+              pathname:`${frontServerIP}${newUser ? 'register' : ''}`
+              
             }));
   else
     await res
