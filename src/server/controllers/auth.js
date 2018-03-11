@@ -191,10 +191,7 @@ const loginCallback = async (req, res, next) => {
               maxAge: 604800
             })
             .redirect(url.format({
-              pathname:`${frontServerIP}${newUser ? 'register' : ''}`,
-              query: {
-                user: jwt.sign({ access_token }, clientSecret)
-              }
+              pathname: `${frontServerIP}${newUser ? 'register' : ''}`
             }));
   else
     await res
@@ -205,10 +202,9 @@ const loginCallback = async (req, res, next) => {
               maxAge: 604800
             })
             .redirect(url.format({
-              pathname:`${frontServerIP}error`,
+              pathname: `${frontServerIP}error`,
               query: {
-                type: 'verifiy',
-                user: jwt.sign({ access_token }, clientSecret)
+                type: 'verifiy'
               }
             }));
 };
