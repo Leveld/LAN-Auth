@@ -1,3 +1,5 @@
+const url = require('url');
+const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const base64 = require('base64-url');
 const { google } = require('googleapis');
@@ -182,15 +184,33 @@ const loginCallback = async (req, res, next) => {
 
   if (email_verified || IS_DEVELOPMENT || IS_PRODUCTION)
     await res
-          .status(307)
-          .cookie('access_token', access_token, {
-            secure: false,
-            domain: domain[2],
-            maxAge: 604800
-          }) 
-          .redirect(frontServerIP + (newUser ? 'register' : '')); //HEROKU COOKIE BUG
+            .status(307)
+            .cookie('access_token', access_token, {
+              secure: false,
+              domain: domain[2],
+              maxAge: 604800
+            })
+            .redirect(url.format({
+              pathname:`${frontServerIP}${newUser ? 'register' : ''}`,
+              query: {
+                user: jwt.sign({ access_token }, clientSecret)
+              }
+            }));
   else
-    await res.redirect(`${frontServerIP}error?type=verify`);
+    await res
+            .status(307)
+            .cookie('access_token', access_token, {
+              secure: false,
+              domain: domain[2],
+              maxAge: 604800
+            })
+            .redirect(url.format({
+              pathname:`${frontServerIP}error`,
+              query: {
+                type: 'verifiy',
+                user: jwt.sign({ access_token }, clientSecret)
+              }
+            }));
 };
 
 module.exports = {
