@@ -187,8 +187,8 @@ const loginCallback = async (req, res, next) => {
             secure: false,
             domain: domain[2],
             maxAge: 604800
-          }) //ADDING HASH FOR HEROKU COOKIE BUG
-          .redirect(frontServerIP + '#' + access_token); //(newUser ? 'register' : '')
+          }) 
+          .redirect(frontServerIP + (newUser ? 'register' : '')); //HEROKU COOKIE BUG
   else
     await res.redirect(`${frontServerIP}error?type=verify`);
 };
