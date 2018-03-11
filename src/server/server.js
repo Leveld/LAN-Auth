@@ -11,7 +11,6 @@ const USE_HEROKU = (() => {
       return true;
   if (process.env.USE_HEROKU === 1 || process.env.USE_HEROKU === true)
     return true;
-  }
   return false;
 })();
 
