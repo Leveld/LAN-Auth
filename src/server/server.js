@@ -9,6 +9,7 @@ const USE_HEROKU = (() => {
   if (typeof process.env.USE_HEROKU === 'string') {
     if (process.env.USE_HEROKU.toLowerCase() === 'true')
       return true;
+  }
   if (process.env.USE_HEROKU === 1 || process.env.USE_HEROKU === true)
     return true;
   return false;
