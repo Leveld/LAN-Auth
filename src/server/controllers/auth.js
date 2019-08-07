@@ -9,6 +9,8 @@ const { frontServerIP, apiServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, IS
 const { clientID, clientSecret, managementToken, googleClientID, googleClientSecret } = require('../secret.json');
 const { COToken } = require('../models');
 
+const authServerIP = 'https://leveld-auth.herokuapp.com/';
+
 const oauth2Client = new OAuth2Client(
   googleClientID,
   googleClientSecret,
