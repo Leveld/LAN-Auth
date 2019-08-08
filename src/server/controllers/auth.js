@@ -5,12 +5,9 @@ const base64 = require('base64-url');
 const { google } = require('googleapis');
 const plus = google.plus('v1');
 const OAuth2Client = google.auth.OAuth2;
-let { frontServerIP, apiServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, IS_PRODUCTION, throwError, googleRedirect } = require('capstone-utils');
+const { frontServerIP, apiServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, IS_PRODUCTION, throwError, googleRedirect } = require('capstone-utils');
 const { clientID, clientSecret, managementToken, googleClientID, googleClientSecret } = require('../secret.json');
 const { COToken } = require('../models');
-
- authServerIP = 'https://leveld-auth.herokuapp.com/';
-frontServerIP = 'https://leveld-frontend.herokuapp.com/';
 
 const oauth2Client = new OAuth2Client(
   googleClientID,
