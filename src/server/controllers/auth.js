@@ -179,10 +179,10 @@ const loginCallback = async (req, res, next) => {
   });
 
   console.log(`Login: access_token=${access_token}`);
-  console.log(frontServerIP);
 
   const domain = /^(https?:\/\/)?([^:^\/]*)(:[0-9]*)?(\/[^#^?]*)(.*)/g.exec(frontServerIP);
-
+  console.log(domain[2]);
+  
   if (email_verified || IS_DEVELOPMENT || IS_PRODUCTION)
     await res
             .status(307)
