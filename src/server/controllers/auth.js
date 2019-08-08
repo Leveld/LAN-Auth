@@ -186,7 +186,7 @@ const loginCallback = async (req, res, next) => {
   if (email_verified || IS_DEVELOPMENT || IS_PRODUCTION)
     await res
             .status(307)
-            .setHeader('Cache-Control', 'private')
+            .setHeader('Set-Cookie', `access_token=${access_token}`)
             .cookie('access_token', access_token, {
               secure: false,
               domain: domain[2],
