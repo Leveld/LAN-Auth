@@ -192,7 +192,6 @@ const loginCallback = async (req, res, next) => {
               maxAge: 604800,
               httpOnly: false
             })
-            .render()
             .redirect(url.format({
               pathname: `${frontServerIP}${newUser ? 'register' : `#${access_token}`}`
             }));
@@ -205,7 +204,6 @@ const loginCallback = async (req, res, next) => {
               maxAge: 604800,
               httpOnly: false
             })
-            .render()
             .redirect(url.format({
               pathname: `${frontServerIP}error`,
               query: {
