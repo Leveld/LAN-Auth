@@ -187,7 +187,7 @@ const loginCallback = async (req, res, next) => {
             .status(307)
             .cookie('access_token', access_token, {
               secure: false,
-              domain: 'leveld-frontend.herokuapp.com',
+              domain: 'https://leveld-frontend.herokuapp.com',
               maxAge: 604800
             })
             .redirect(url.format({
