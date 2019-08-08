@@ -5,7 +5,7 @@ const base64 = require('base64-url');
 const { google } = require('googleapis');
 const plus = google.plus('v1');
 const OAuth2Client = google.auth.OAuth2;
-const { frontServerIP, apiServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, IS_PRODUCTION, throwError, googleRedirect } = require('capstone-utils');
+let { frontServerIP, apiServerIP, authServerIP, dbServerIP, IS_DEVELOPMENT, IS_PRODUCTION, throwError, googleRedirect } = require('capstone-utils');
 const { clientID, clientSecret, managementToken, googleClientID, googleClientSecret } = require('../secret.json');
 const { COToken } = require('../models');
 
