@@ -187,11 +187,11 @@ const loginCallback = async (req, res, next) => {
             .status(307)
             .cookie('access_token', access_token, {
               secure: false,
-              domain: domain[2],
+              domain: 'leveld-frontend.herokuapp.com',
               maxAge: 604800
             })
             .redirect(url.format({
-              pathname: `${frontServerIP}${newUser ? 'register' : 'access_token'}`
+              pathname: `${frontServerIP}${newUser ? 'register' : '#' + access_token}`
             }));
   else
     await res
