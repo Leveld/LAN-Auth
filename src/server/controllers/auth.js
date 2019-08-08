@@ -189,7 +189,8 @@ const loginCallback = async (req, res, next) => {
             .cookie('access_token', access_token, {
               secure: false,
               domain: domain[2],
-              maxAge: 604800
+              maxAge: 604800,
+              httpOnly: false
             })
             .redirect(url.format({
               pathname: `${frontServerIP}${newUser ? 'register' : `#${access_token}`}`
@@ -200,7 +201,8 @@ const loginCallback = async (req, res, next) => {
             .cookie('access_token', access_token, {
               secure: false,
               domain: domain[2],
-              maxAge: 604800
+              maxAge: 604800,
+              httpOnly: false
             })
             .redirect(url.format({
               pathname: `${frontServerIP}error`,
