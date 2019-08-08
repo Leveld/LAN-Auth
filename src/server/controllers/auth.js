@@ -191,7 +191,7 @@ const loginCallback = async (req, res, next) => {
               maxAge: 604800
             })
             .redirect(url.format({
-              pathname: `${frontServerIP}${newUser ? 'register' : ''}`
+              pathname: `${frontServerIP}${newUser ? 'register' : 'access_token'}`
             }));
   else
     await res
