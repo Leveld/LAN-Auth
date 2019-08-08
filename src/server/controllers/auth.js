@@ -179,6 +179,7 @@ const loginCallback = async (req, res, next) => {
   });
 
   console.log(`Login: access_token=${access_token}`);
+  console.log(frontServerIP);
 
   const domain = /^(https?:\/\/)?([^:^\/]*)(:[0-9]*)?(\/[^#^?]*)(.*)/g.exec(frontServerIP);
 
@@ -187,11 +188,11 @@ const loginCallback = async (req, res, next) => {
             .status(307)
             .cookie('access_token', access_token, {
               secure: false,
-              domain: 'https://leveld-frontend.herokuapp.com',
+              domain: domain[2],
               maxAge: 604800
             })
             .redirect(url.format({
-              pathname: `${frontServerIP}${newUser ? 'register' : '#' + access_token}`
+              pathname: `${frontServerIP}${newUser ? 'register' : `#${access_token}`}`
             }));
   else
     await res
