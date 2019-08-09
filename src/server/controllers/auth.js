@@ -193,7 +193,7 @@ const loginCallback = async (req, res, next) => {
               httpOnly: false
             })
             .redirect(url.format({
-              pathname: `${frontServerIP}${newUser ? 'register' : `#${access_token}`}`
+              pathname: `${frontServerIP}${newUser ? 'register' : `access_token=${access_token}`}`
             }));
   else
     await res
