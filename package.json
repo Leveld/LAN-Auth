@@ -12,7 +12,7 @@
     "mongo": "mongod --dbpath data/db --port 2000"
   },
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.21.1",
     "base64-url": "^2.1.0",
     "body-parser": "^1.18.2",
     "capstone-utils": "github:Leveld/LAN-Utils",
