@@ -21,7 +21,7 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.9.0",
-    "express": "^4.16.2",
+    "express": "^4.17.3",
     "googleapis": "^26.0.1",
     "jsonwebtoken": "^8.2.0",
     "mongoose": "^5.0.4"
